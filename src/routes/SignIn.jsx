@@ -1,16 +1,35 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function SignIn() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simple fake login
-    localStorage.setItem("user", JSON.stringify({ email }));
-    navigate("/dashboard");
+    setError("");
+
+    try {
+      const response = await axios.post("http://127.0.0.1:8000/api/token/", {
+        username,
+        password,
+      });
+
+      // Save tokens to local storage
+      localStorage.setItem("access", response.data.access);
+      localStorage.setItem("refresh", response.data.refresh);
+
+      // Optionally save user info (or fetch it later)
+      localStorage.setItem("user", JSON.stringify({ username }));
+
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err);
+      setError("Invalid username or password. Please try again.");
+    }
   };
 
   return (
@@ -22,10 +41,10 @@ export default function SignIn() {
         <h2 className="text-xl font-semibold mb-4 text-center">Sign In</h2>
 
         <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           required
           className="w-full mb-3 p-2 border rounded dark:bg-gray-700 dark:border-gray-600"
         />

@@ -11,7 +11,7 @@ export default function Shell({ children }) {
   <div className="flex-1 flex flex-col">
     <header className="flex justify-between items-center bg-white dark:bg-gray-800 shadow px-4 py-3">
       <h1 className="text-xl font-semibold text-indigo-600 dark:text-indigo-400">
-        Church Management
+        Church Management System
       </h1>
 
           <div className="flex items-center gap-3">
