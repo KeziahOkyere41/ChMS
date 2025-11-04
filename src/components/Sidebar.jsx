@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   Home,
@@ -24,9 +24,20 @@ const links = [
 
 export default function Sidebar({ isCollapsed }) {
   const navigate = useNavigate();
+  const [user, setUser] = useState(null);
 
-  const handleLogout = () => {
-    localStorage.removeItem("user"); // remove stored login
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+    const handleLogout = () => {
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+    localStorage.removeItem("user");
+    setUser(null);
     navigate("/signin");
   };
 
@@ -64,21 +75,34 @@ export default function Sidebar({ isCollapsed }) {
       </nav>
 
       <div className="border-t border-gray-200 dark:border-gray-700 p-3">
-        <button
-          onClick={() => navigate("/signin")}
-          className="flex items-center gap-3 w-full text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md px-4 py-2 text-sm font-medium"
-        >
-          <LogIn size={18} />
-          {!isCollapsed && <span>Sign In</span>}
-        </button>
+        {user ? (
+    // ✅ Show Username + Logout when logged in
+    <>
+      <div className="flex items-center gap-3 px-4 py-2">
+        <div className="w-8 h-8 rounded-full bg-indigo-500 text-white flex items-center justify-center">
+          {user.username.charAt(0).toUpperCase()}
+        </div>
+        {!isCollapsed && <span className="font-medium">{user.username}</span>}
+      </div>
 
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 w-full text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 rounded-md px-4 py-2 text-sm font-medium mt-1"
-        >
-          <LogOut size={18} />
-          {!isCollapsed && <span>Logout</span>}
-        </button>
+      <button
+        onClick={handleLogout}
+        className="flex items-center gap-3 w-full text-red-600 hover:bg-red-50 dark:hover:bg-gray-700 rounded-md px-4 py-2 text-sm font-medium mt-1"
+      >
+        <LogOut size={18} />
+        {!isCollapsed && <span>Logout</span>}
+      </button>
+    </>
+  ) : (
+    // ✅ Show only Sign In if user is NOT logged in
+    <button
+      onClick={() => navigate("/signin")}
+      className="flex items-center gap-3 w-full text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md px-4 py-2 text-sm font-medium"
+    >
+      <LogIn size={18} />
+      {!isCollapsed && <span>Sign In</span>}
+    </button>
+  )}
       </div>
     </div>
   );

@@ -18,11 +18,9 @@ export default function SignIn() {
         password,
       });
 
-      // Save tokens to local storage
       localStorage.setItem("access", response.data.access);
       localStorage.setItem("refresh", response.data.refresh);
 
-      // Optionally save user info (or fetch it later)
       localStorage.setItem("user", JSON.stringify({ username }));
 
       navigate("/dashboard");
